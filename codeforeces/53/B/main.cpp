@@ -16,35 +16,37 @@ inline bool okay_ratio(int a, int b) {
 }
 
 int solve_width(int e, int h, int w_len) {
+  cerr << "W FUN =================== " << endl;
   int s = 1;
-  int result = 1;
   while (s < e) {
     int width = (s + e) / 2;
-    if (okay_ratio(h, w_len - width)) {
-      e = width - 1;
-      result = e;
+    if (okay_ratio(h, width)) {
+      cerr << "(h, w) = " << h << " " << width << endl;
+      return width;
     } else if (h > 1.25 * width) {
       s = width + 1;
     } else if (h < 0.8 * width) {
       e = width - 1;
     }
   }
-  return result;
+  return -1;
 }
 
 int solve_height(int e, int w, int h_len) {
+  cerr << "H FUN ====================== " << endl;
   int s = 1;
-  int result = 1;
   while (s < e) {
     int height = (s + e) / 2;
-    if (okay_ratio(h_len - height, w)) {
-      s = height + 1;
-      result = s;
+    if (okay_ratio(height, w)) {
+      cerr << "(h, w) = " << height << " " << w << endl;
+      return height;
     } else if (height > 1.25 * w) {
       e = height - 1;
-    } else if (height < 0.8 * w)
+    } else if (height < 0.8 * w) {
+      s = height + 1;
+    }
   }
-  return e;
+  return -1;
 }
 
 int main() {
@@ -54,14 +56,16 @@ int main() {
   int wi = -1;
   int hi = -1;
   for (int i = 0; i < (int) twos.size(); i++) {
-    if (w <= twos[i]) {
+    if (twos[i] <= w) {
       wi = i;
     }
-    if (h <= twos[i]) {
+    if (twos[i] <= h) {
       hi = i;
     }
   }
-  pair<int, int> resutl1 = { twos[hi], solve_width(w, twos[hi], w) };
-  pair<int, int> resutl2 = { solve_height(h, twos[wi], h), twos[wi] };
+  pair<int, int> result1 = { twos[hi], solve_width(w, twos[hi], w) };
+  cerr << result1.first << " " << result1.second << endl;
+  pair<int, int> result2 = { solve_height(h, twos[wi], h), twos[wi] };
+  cerr << result2.first << " " << result2.second << endl;
   return 0;
 }
