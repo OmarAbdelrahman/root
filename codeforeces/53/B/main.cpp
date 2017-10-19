@@ -77,22 +77,12 @@ int main() {
   area = -1;
   pair<long long, long long> result1 = { twos[hi], solve_width(w, twos[hi]) };
   pair<long long, long long> result2 = { solve_height(h, twos[wi], result1.first), twos[wi] };
-  if (result1.first == -1 || result1.second == -1) {
-    cout << result2 << endl;
-  } else if (result2.first == -1 || result2.second == -1) {
+  long long a1 = result1.first * result1.second;
+  long long a2 = result2.first * result2.second;
+  if (a1 > a2 || (a1 == a2 && result1.first > result2.first)) {
     cout << result1 << endl;
   } else {
-    if (result1.first * result1.second > result2.first * result2.second) {
-      cout << result1 << endl;
-    } else if (result1.first * result1.second < result2.first * result2.second) {
-      cout << result2 << endl;
-    } else {
-      if (result1.first > result2.first) {
-        cout << result1 << endl;
-      } else {
-        cout << result2 << endl;
-      }
-    }
+    cout << result2 << endl;
   }
   return 0;
 }
