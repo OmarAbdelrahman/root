@@ -3,8 +3,17 @@ using namespace std;
 
 int area;
 
-ostream& operator << (ostream& ostr, const pair<long long, long long>& p) {
-  ostr << p.first << " " << p.second;
+struct rectangle {
+  long long h;
+  long long w;
+
+  long long area() const {
+    return h * w;
+  }
+};
+
+ostream& operator << (ostream& ostr, const rectangle& r) {
+  ostr << r.h << " " << r.w;
   return ostr;
 }
 
@@ -75,14 +84,14 @@ int main() {
     }
   }
   area = -1;
-  pair<long long, long long> result1 = { twos[hi], solve_width(w, twos[hi]) };
-  pair<long long, long long> result2 = { solve_height(h, twos[wi], result1.first), twos[wi] };
-  long long a1 = result1.first * result1.second;
-  long long a2 = result2.first * result2.second;
-  if (a1 > a2 || (a1 == a2 && result1.first > result2.first)) {
-    cout << result1 << endl;
+  rectangle r1 = { twos[hi], solve_width(w, twos[hi]) };
+  rectangle r2 = { solve_height(h, twos[wi], r1.h), twos[wi] };
+  long long a1 = r1.area();
+  long long a2 = r2.area();
+  if (a1 > a2 || (a1 == a2 && r1.h > r2.h)) {
+    cout << r1 << endl;
   } else {
-    cout << result2 << endl;
+    cout << r2 << endl;
   }
   return 0;
 }
