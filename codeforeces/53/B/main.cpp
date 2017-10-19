@@ -1,7 +1,12 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const double EPSILON = 1e-9;
+int area;
+
+ostream& operator << (ostream& ostr, const pair<long long, long long>& p) {
+  ostr << p.first << " " << p.second;
+  return ostr;
+}
 
 vector<int> power_of_twos(int limit) {
   vector<int> result(1, 1);
@@ -11,42 +16,48 @@ vector<int> power_of_twos(int limit) {
   return result;
 }
 
-inline bool okay_ratio(int a, int b) {
-  return 0.8 * b <= a * 1.0 && a * 1.0 <= 1.25;
+inline bool okay_ratio(long long a, long long b) {
+  return 4 * b <= a * 5 && a * 4 <= 5 * b;
 }
 
-int solve_width(int e, int h, int w_len) {
-  cerr << "W FUN =================== " << endl;
-  int s = 1;
-  while (s < e) {
-    int width = (s + e) / 2;
+long long solve_width(long long e, long long h) {
+  long long s = 1;
+  long long result = -1;
+  while (s <= e) {
+    long long width = (s + e) / 2;
     if (okay_ratio(h, width)) {
-      cerr << "(h, w) = " << h << " " << width << endl;
-      return width;
-    } else if (h > 1.25 * width) {
       s = width + 1;
-    } else if (h < 0.8 * width) {
+      if (h * width > area) {
+        area = h * width;
+        result = width;
+      }
+    } else if (h * 4 > 5 * width) {
+      s = width + 1;
+    } else if (h * 5 < 4 * width) {
       e = width - 1;
     }
   }
-  return -1;
+  return result;
 }
 
-int solve_height(int e, int w, int h_len) {
-  cerr << "H FUN ====================== " << endl;
-  int s = 1;
-  while (s < e) {
-    int height = (s + e) / 2;
+long long solve_height(long long e, long long w, long long cur_h) {
+  long long s = 1;
+  long long result = -1;
+  while (s <= e) {
+    long long height = (s + e) / 2;
     if (okay_ratio(height, w)) {
-      cerr << "(h, w) = " << height << " " << w << endl;
-      return height;
-    } else if (height > 1.25 * w) {
+      s = height + 1;
+      if (height * w > area || (height * w == area && height > cur_h)) {
+        area = height * w;
+        result = height;
+      }
+    } else if (height * 4 > 5 * w) {
       e = height - 1;
-    } else if (height < 0.8 * w) {
+    } else if (height * 5 < 4 * w) {
       s = height + 1;
     }
   }
-  return -1;
+  return result;
 }
 
 int main() {
@@ -63,9 +74,25 @@ int main() {
       hi = i;
     }
   }
-  pair<int, int> result1 = { twos[hi], solve_width(w, twos[hi], w) };
-  cerr << result1.first << " " << result1.second << endl;
-  pair<int, int> result2 = { solve_height(h, twos[wi], h), twos[wi] };
-  cerr << result2.first << " " << result2.second << endl;
+  area = -1;
+  pair<long long, long long> result1 = { twos[hi], solve_width(w, twos[hi]) };
+  pair<long long, long long> result2 = { solve_height(h, twos[wi], result1.first), twos[wi] };
+  if (result1.first == -1 || result1.second == -1) {
+    cout << result2 << endl;
+  } else if (result2.first == -1 || result2.second == -1) {
+    cout << result1 << endl;
+  } else {
+    if (result1.first * result1.second > result2.first * result2.second) {
+      cout << result1 << endl;
+    } else if (result1.first * result1.second < result2.first * result2.second) {
+      cout << result2 << endl;
+    } else {
+      if (result1.first > result2.first) {
+        cout << result1 << endl;
+      } else {
+        cout << result2 << endl;
+      }
+    }
+  }
   return 0;
 }
