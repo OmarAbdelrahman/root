@@ -14,14 +14,13 @@ void check(long long h, long long w) {
 }
 
 int main() {
-  int h, w;
+  long long h, w;
   cin >> h >> w;
-  rh = -1, rw = 1;
-  for (int i = 1; i <= h; i *= 2) {
-    check(i, w);
+  for (long long ch = 1; ch <= h; ch *= 2) {
+    check(ch, min(w, ch * 5 / 4));
   }
-  for (int i = 1; i <= w; i *= 2) {
-    check(h, i);
+  for (long long cw = 1; cw <= w; cw *= 2) {
+    check(min(h, cw * 5 / 4), cw);
   }
   cout << rh << " " << rw << endl;
   return 0;
