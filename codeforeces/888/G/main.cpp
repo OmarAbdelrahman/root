@@ -63,18 +63,5 @@ long long mst(int nodes, vector<edge<long long>>& edge_list) {
 }
 
 int main() {
-  int n;
-  cin >> n;
-  vector<long long> vs(n);
-  for (long long& it : vs) {
-    cin >> it;
-  }
-  vector<edge<long long>> edge_list;
-  for (int i = 0; i < n; i++) {
-    for (int j = i + 1; j < n; j++) {
-      edge_list.push_back(edge<long long>(i, j, vs[i] ^ vs[j]));
-    }
-  }
-  cout << mst(n, edge_list) << endl;
   return 0;
 }

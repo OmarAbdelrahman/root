@@ -1,0 +1,9 @@
+**/check.sh
+**/compile.sh
+**/in*.in
+**/res*.out
+**/out*.out
+**/parse_task.py
+**/parse_tasks.py
+**/main
+**/main.dSYM
