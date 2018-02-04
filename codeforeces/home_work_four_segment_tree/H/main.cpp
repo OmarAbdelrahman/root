@@ -4,105 +4,99 @@ using namespace std;
 const long long INF = numeric_limits<long long>::max();
 
 struct node {
-    int b, e;
     long long sum = 0;
-    long long weighted_sum = 0;
-    long long delayed = INF;
-    long long size;
+    long long wsum = 0;
+    long long delayed = 0;
+    long long size = 0;
 
     void update(int d) {
-        delayed = delayed == INF ? d : delayed + d;
-        sum += 1LL * size * d;
-        weighted_sum += (size * (size + 1) / 2) * d;
+        delayed += d;
+        sum += d * size;
+        wsum += size * (size + 1) / 2 * d;
     }
 
-    friend ostream& operator << (ostream& ostr, const node& mn) {
-        ostr << "[" << mn.b << ", " << mn.e << "] = "
-             << "(sum=" << mn.sum
-             << ", weighted_sum=" << mn.weighted_sum
-             << ", delayed=" << mn.delayed
-             << ", size=" << mn.size << ")";
-        return ostr;
+    static node* combine(node* a, node* b) {
+        if (a == nullptr) return b;
+        if (b == nullptr) return a;
+        node* n = new node();
+        n->sum = a->sum + b->sum;
+        n->size = a->size + b->size;
+        n->wsum = a->wsum + b->wsum + a->size * b->sum;
+        return n;
     }
 };
 
 struct segment_tree {
-    segment_tree(const vector<int>& _a): a(_a), t(4 * a.size()) {
+    segment_tree(const vector<int>& _a): a(_a), tree(4 * a.size()) {
         build(0, 0, a.size() - 1);
     }
 
-    void inc(int b, int e, int d) {
-        inc(0, 0, a.size() - 1, b, e, d);
+    void inc(int l, int r, int by) {
+        inc(0, 0, a.size() - 1, l, r, by);
     }
 
-    long long query(int b, int e) {
-        return query(0, 0, a.size() - 1, b, e);
-    }
-
-    friend ostream& operator << (ostream& ostr, const segment_tree& tree) {
-        for (const auto& mn : tree.t) ostr << mn << endl;
-        return ostr;
+    node* query(int l, int r) {
+        return query(0, 0, a.size() - 1, l, r);
     }
 
 private:
     void collect(int i) {
-        t[i].sum = t[2 * i + 1].sum + t[2 * i + 2].sum;
-        t[i].weighted_sum = t[2 * i + 1].weighted_sum + t[2 * i + 2].weighted_sum + t[2 * i + 1].size * t[2 * i + 2].sum;
+        tree[i].sum = tree[2 * i + 1].sum + tree[2 * i + 2].sum;
+        tree[i].wsum = tree[2 * i + 1].wsum + tree[2 * i + 2].wsum + tree[2 * i + 1].size * tree[2 * i + 2].sum;
     }
 
     void push_down(int i) {
-        if (t[i].delayed != INF) {
-            t[2 * i + 1].update(t[i].delayed);
-            t[2 * i + 2].update(t[i].delayed);
-            t[i].delayed = INF;
+        if (tree[i].delayed != 0) {
+            tree[2 * i + 1].update(tree[i].delayed);
+            tree[2 * i + 2].update(tree[i].delayed);
+            tree[i].delayed = 0;
         }
     }
 
-    void build(int i, int L, int R) {
-        t[i].b = L;
-        t[i].e = R;
-        t[i].size = R - L + 1;
-        if (L == R) {
-            t[i].sum = t[i].weighted_sum = a[L];
+    void build(int i, int l, int r) {
+        tree[i].size = r - l + 1;
+        if (l == r) {
+            tree[i].sum = tree[i].wsum = a[l];
         } else {
-            int M = (L + R) / 2;
-            build(2 * i + 1, L, M);
-            build(2 * i + 2, M + 1, R);
+            int m = (l + r) / 2;
+            build(2 * i + 1, l, m);
+            build(2 * i + 2, m + 1, r);
             collect(i);
         }
     }
 
-    void inc(int i, int L, int R, int l, int r, int d) {
+    void inc(int i, int L, int R, int l, int r, int by) {
         if (L == l && R == r) {
-            t[i].update(d);
+            tree[i].update(by);
         } else {
             push_down(i);
-            int M = (L + R) / 2;
-            if (l <= M)
-                inc(2 * i + 1, L, M, l, min(M, r), d);
-            if (r > M)
-                inc(2 * i + 2, M + 1, R, max(l, M + 1), r, d);
+            int m = (L + R) / 2;
+            if (l <= m)
+                inc(2 * i + 1, L, m, l, min(m, r), by);
+            if (r > m)
+                inc(2 * i + 2, m + 1, R, max(l, m + 1), r, by);
             collect(i);
         }
     }
 
-    long long query(int i, int L, int R, int l, int r) {
+    node* query(int i, int L, int R, int l, int r) {
         if (L == l && R == r) {
-            return t[i].weighted_sum;
+            return &tree[i];
         } else {
             push_down(i);
-            long long result = 0;
-            int M = (L + R) / 2;
-            if (l <= M)
-                result += query(2 * i + 1, L, M, l, min(M, r));
-            if (r > M)
-                result += query(2 * i + 2, M + 1, R, max(l, M + 1), r);
-            return result;
+            node* n1 = nullptr;
+            node* n2 = nullptr;
+            int m = (L + R) / 2;
+            if (l <= m)
+                n1 = query(2 * i + 1, L, m, l, min(m, r));
+            if (r > m)
+                n2 = query(2 * i + 2, m + 1, R, max(l, m + 1), r);
+            return node::combine(n1, n2);
         }
     }
 
     vector<int> a;
-    vector<node> t;
+    vector<node> tree;
 };
 
 int main() {
@@ -115,8 +109,6 @@ int main() {
     }
 
     segment_tree tree(a);
-    cerr << tree << endl;
-    cerr << "=============" << endl;
     while (q-- > 0) {
         int t, b, e;
         scanf("%d%d%d", &t, &b, &e);
@@ -124,10 +116,8 @@ int main() {
             int x;
             scanf("%d", &x);
             tree.inc(b - 1, e - 1, x);
-            cerr << tree << endl;
-            cerr << "=============" << endl;
         } else {
-            printf("%lld\n", tree.query(b - 1, e - 1));
+            printf("%lld\n", tree.query(b - 1, e - 1)->wsum);
         }
     }
 }
