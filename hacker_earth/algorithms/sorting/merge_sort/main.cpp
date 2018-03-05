@@ -4,6 +4,7 @@ using namespace std;
 const int N = 1000000;
 
 int a[N];
+int c[N];
 
 long long sort(int b, int e) {
     if (b >= e) return 0;
@@ -17,7 +18,7 @@ long long sort(int b, int e) {
     int jr = m + 1;
     int ti = 0;
 
-    long long res = 0;
+    long long res = ls + rs;
     for (int i = b; i <= e; i++) {
         if (jl > m) {
             t[ti++] = a[jr++];
@@ -33,7 +34,7 @@ long long sort(int b, int e) {
     for (int i = 0, ai = b; i < ti; i++) {
         a[ai++] = t[i];
     }
-    return res + rs + ls;
+    return res;
 }
 
 int main() {
@@ -44,6 +45,6 @@ int main() {
     for (int i = 0; i < n; i++) {
         cin >> a[i];
     }
-    int swaps = sort(0, n - 1);
+    long long swaps = sort(0, n - 1);
     cout << swaps << '\n';
 }
