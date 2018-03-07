@@ -4,6 +4,6 @@
 **/res*.out
 **/out*.out
 **/parse_task.py
-**/parse_tasks.py
+**/parse_task*.py
 **/main
 **/main.dSYM
